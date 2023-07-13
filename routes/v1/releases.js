@@ -8,7 +8,6 @@ router.get('/releases', (request, response) => {
             response.json({ message: 'API rate limit' });
         } else {
             let resourceReleases = [];
-            let countReleases = 0;
             let count = 0;
 
             for (const release of data) {
@@ -19,21 +18,19 @@ router.get('/releases', (request, response) => {
 
                     if (['assets'].includes(property)) {
                         for (const archive of release[property]) {
-                            let archiveCount = 0;
-                            for (const property of Reflect.ownKeys(archive)) {
-                                if (['name', 'download_count', 'created_at', 'updated_at', 'browser_download_url'].includes(property)) {
-                                    if (resourceReleases[count]['assets'] == undefined) resourceReleases[count]['assets'] = [];
-                                    if (resourceReleases[count]['assets'][archiveCount] == undefined) resourceReleases[count]['assets'][archiveCount] = {};
-                                    resourceReleases[count]['assets'][archiveCount][property] = archive[property];;
-                                }
+                            if (resourceReleases[count]['assets'] == undefined) resourceReleases[count]['assets'] = [];
 
-                                archiveCount++;
-                            }
+                            resourceReleases[count]['assets'].push({
+                                name: archive['name'],
+                                download_count: archive['download_count'],
+                                created_at: archive['created_at'],
+                                updated_at: archive['updated_at'],
+                                browser_download_url: archive['browser_download_url']
+                            });
                         }
                     }
                 }
 
-                countReleases++;
                 count++;
             }
 
